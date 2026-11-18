@@ -1,0 +1,7 @@
+[package]
+name = "a02_quick_start"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+apple-metal = "0.10.4"
