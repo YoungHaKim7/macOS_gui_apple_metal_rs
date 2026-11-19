@@ -1,6 +1,7 @@
-# macOS_gui_apple_metal_rs
-- Safe Rust bindings for Apple's Metal framework
-  - https://github.com/doom-fish/apple-metal-rs
+# macOS GUI Apple_Metal_rs
+
+# Rust bindings to Core Foundation and other low level libraries on Mac OS X and iOS
+- https://github.com/servo/core-foundation-rs
 
 # objc2
 - https://crates.io/crates/objc2
