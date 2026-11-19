@@ -10,3 +10,7 @@
 # objc2
 - https://crates.io/crates/objc2
 - https://docs.rs/objc2/latest/objc2/
+
+# Computer Graphics Fundamentals
+
+- [Linear Algebra](https://www.3blue1brown.com/?topic=linear-algebra)
