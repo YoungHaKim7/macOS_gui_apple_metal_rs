@@ -2,7 +2,9 @@
 
 #include <iostream>
 
-int main(int argc, const char *argv[]) {
+// int main(int argc, const char *argv[]) {
+int main() {
+
     // insert code here...
 
     MTL::Device *metalDevice = MTL::CreateSystemDefaultDevice();
