@@ -22,3 +22,8 @@
 # Computer Graphics Fundamentals
 
 - [Linear Algebra](https://www.3blue1brown.com/?topic=linear-algebra)
+
+# Metal-cpp를 통해 C++로 Metal 프로그래밍
+- [wwdc22에서 Metal-cpp를 통해 C++로 Metal 프로그래밍을(를) 확인하십시오.apple devw자료2022년](https://developer.apple.com/kr/videos/play/wwdc2022/10160)
+
+- [2022wwdc유튜브 영상) Metal-cpp를 통해 C++로 Metal 프로그래밍](https://youtu.be/h1mOkhFOSPU?si=u9kC4wrRnAyuTEVH)
