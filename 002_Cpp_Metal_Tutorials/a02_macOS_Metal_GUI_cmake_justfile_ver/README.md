@@ -53,6 +53,15 @@ add_executable(${ProjectId}
 
 target_link_options(${ProjectId} PRIVATE -pthread -lm)
 
+if(APPLE)
+    find_library(METAL_FW      Metal      REQUIRED)
+    find_library(FOUNDATION_FW Foundation REQUIRED)
+    find_library(QUARTZCORE_FW QuartzCore REQUIRED)
+    target_link_libraries(${ProjectId} PRIVATE
+        ${METAL_FW} ${FOUNDATION_FW} ${QUARTZCORE_FW}
+    )
+endif()
+
 # ---- Fetch metal-cpp into include/metal-cpp ----
 include(FetchContent)
 
@@ -75,11 +84,14 @@ target_include_directories(${ProjectId} SYSTEM PRIVATE
 # Foundation  -> NS*ErrorDomain, NS*Notification, objc_getProtocol/lookUpClass,
 #                sel_registerName (libobjc is re-exported via Foundation)
 # QuartzCore  -> CA::MetalLayer, needed as soon as you render into a view
+# ---- Link the frameworks metal-cpp wraps ----
+# SHELL: prefix prevents CMake from de-duplicating the repeated "-framework"
+# token (which broke the link line: "-framework Metal Foundation QuartzCore").
 if(APPLE)
     target_link_options(${ProjectId} PRIVATE
-        -framework Metal
-        -framework Foundation
-        -framework QuartzCore
+        "SHELL:-framework Metal"
+        "SHELL:-framework Foundation"
+        "SHELL:-framework QuartzCore"
     )
 endif()
 
