@@ -1,6 +1,9 @@
 # Rust bindings to Core Foundation and other low level libraries on Mac OS X and iOS
 - https://github.com/servo/core-foundation-rs
 
+# core-foundation-rs: A 200-Day Study Guide
+- Audience: A learner with some C++ background who is new to Rust and wants to deeply understand the `core-foundation-rs` codebase.
+
 | File | Size | Covers |
 |---|---|---|
 | [01-rust-primer-and-study-plan.md](/home/z/my-project/download/01-rust-primer-and-study-plan.md) | 59 KB | Rust primer with side-by-side C++ comparisons (ownership, borrowing, lifetimes, traits, generics, `unsafe`, FFI, Cargo) + the full 200-day study plan |
