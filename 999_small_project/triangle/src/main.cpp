@@ -11,12 +11,10 @@
 #include <cstdint>
 #include <cstdio>
 
-// objc runtime linkage
-extern "C" id objc_getClass(const char *);
-extern "C" SEL sel_registerName(const char *);
-extern "C" id objc_msgSend(id, SEL, ...);
-
-// Typed objc_msgSend wrapper
+// objc_msgSend is declared as `void objc_msgSend(void)` in the SDK (a
+// placeholder). The Apple-documented arm64 pattern is to cast it to the
+// exact function-pointer type at each call site. The send<> wrapper does
+// that, and fixes the ABI for narrow types (BOOL etc.).
 template <typename R, typename... Args>
 static inline R send(id self, SEL sel, Args... args) {
     return reinterpret_cast<R (*)(id, SEL, Args...)>(objc_msgSend)(self, sel,
@@ -24,7 +22,7 @@ static inline R send(id self, SEL sel, Args... args) {
 }
 
 // ---------------------------------------------------------------------------
-// Inline Metal shader source (compiled at runtime via newLibraryWithSource)
+// Inline Metal shader source (compiled at runtime)
 // ---------------------------------------------------------------------------
 static const char *kShaderSrc = R"(
 #include <metal_stdlib>
@@ -58,7 +56,7 @@ fragment float4 fs_main(VOut in [[stage_in]]) {
 )";
 
 // ---------------------------------------------------------------------------
-// Renderer: owns device, command queue, shader library, pipeline state
+// Renderer
 // ---------------------------------------------------------------------------
 struct Renderer {
     MTL::Device *device = nullptr;
@@ -81,14 +79,25 @@ struct Renderer {
 
         queue = device->newCommandQueue();
 
-        NS::Error *err = nullptr;
+        // Compile shaders from source. The current metal-cpp main branch
+        // exposes only the block-based overload:
+        //   newLibraryWithSource(src, opts, SourceErrorHandler)
+        // SourceErrorHandler is a clang Block type, which -pedantic-errors
+        // rejects. Suppress -Wpedantic locally so the block compiles.
         NS::String *src =
             NS::String::string(kShaderSrc, NS::UTF8StringEncoding);
-        library = device->newLibraryWithSource(src, nullptr, &err);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpedantic"
+        MTL::SourceErrorHandler handler = ^(NS::Integer, NS::Error *err) {
+          if (err) {
+              std::printf("shader compile error: %s\n",
+                          err->localizedDescription()->utf8String());
+          }
+        };
+        library = device->newLibraryWithSource(src, nullptr, handler);
+#pragma clang diagnostic pop
         if (!library) {
-            std::printf("shader compile error: %s\n",
-                        err ? err->localizedDescription()->utf8String()
-                            : "(unknown)");
+            std::puts("failed to compile shader library");
             return false;
         }
 
@@ -103,6 +112,7 @@ struct Renderer {
         desc->colorAttachments()->object(0)->setPixelFormat(
             MTL::PixelFormatBGRA8Unorm);
 
+        NS::Error *err = nullptr;
         pso = device->newRenderPipelineState(desc, &err);
         if (vsFn)
             vsFn->release();
@@ -161,7 +171,12 @@ struct Renderer {
 };
 
 // ---------------------------------------------------------------------------
-// AppKit wrappers via objc runtime (metal-cpp doesn't wrap AppKit)
+// AppKit wrappers via objc runtime
+//   metal-cpp doesn't wrap AppKit classes (NSApplication / NSWindow / NSView),
+//   so we reach them through the objc runtime. Class methods (e.g. +alloc,
+//   +sharedApplication, +stringWithUTF8String:) are sent to the Class object;
+//   instance methods (initWith…, set…, makeKey…) are sent to the instance
+//   returned by +alloc.
 // ---------------------------------------------------------------------------
 static id NSApp() {
     static id app = send<id>((id)objc_getClass("NSApplication"),
@@ -171,11 +186,14 @@ static id NSApp() {
 
 static id createWindow(CGRect frame) {
     id cls = (id)objc_getClass("NSWindow");
+    id allocd = send<id>(cls, sel_registerName("alloc")); // +alloc -> instance
     // NSWindowStyleMaskTitled(1) | Closable(2) | Miniaturizable(4)
-    NSUInteger style = 1 | 2 | 4;
+    NS::UInteger style = 1 | 2 | 4;
+    NS::UInteger backing = 2; // NSBackingStoreBuffered
     id win = send<id>(
-        cls, sel_registerName("initWithContentRect:styleMask:backing:defer:"),
-        frame, style, 2 /* NSBackingStoreBuffered */, (BOOL)0);
+        allocd,
+        sel_registerName("initWithContentRect:styleMask:backing:defer:"), frame,
+        style, backing, (BOOL)0);
     id title = send<id>((id)objc_getClass("NSString"),
                         sel_registerName("stringWithUTF8String:"),
                         "Metal-CPP Triangle");
@@ -186,13 +204,16 @@ static id createWindow(CGRect frame) {
 
 static id createView(CGRect frame) {
     id cls = (id)objc_getClass("NSView");
-    id view = send<id>(cls, sel_registerName("initWithFrame:"), frame);
+    id allocd = send<id>(cls, sel_registerName("alloc"));
+    id view = send<id>(allocd, sel_registerName("initWithFrame:"), frame);
     send<void>(view, sel_registerName("setWantsLayer:"), (BOOL)1);
     return view;
 }
 
 // AppDelegate: terminate when the user closes the last window.
-static NSUInteger onShouldTerminateAfterLastWindowClosed(id, SEL, id) {
+// NSApplicationTerminateReply is NSUInteger, so the encoding char is 'L'
+// (unsigned long on LP64). Type string "L@:@" = NSUInteger(id, SEL, id).
+static NS::UInteger onShouldTerminateAfterLastWindowClosed(id, SEL, id) {
     return 1; // NSTerminateNow
 }
 
@@ -203,16 +224,17 @@ static id createAppDelegate() {
         class_addMethod(newCls,
                         sel_registerName(
                             "applicationShouldTerminateAfterLastWindowClosed:"),
-                        (IMP)onShouldTerminateAfterLastWindowClosed, "Q@:@");
+                        (IMP)onShouldTerminateAfterLastWindowClosed, "L@:@");
         objc_registerClassPair(newCls);
         return send<id>((id)newCls, sel_registerName("new"));
     }
-    // Fallback if the class name was already registered (e.g. re-run)
+    // Fallback if the class name was already registered (e.g. on re-run).
     return send<id>((id)objc_getClass("TriangleAppDelegate"),
                     sel_registerName("new"));
 }
 
-// Frame callback (function-pointer variant; no -fblocks needed)
+// Frame callback — function-pointer variant of dispatch_source handler,
+// so we don't need -fblocks for the render loop.
 static void renderTick(void *ctx) { static_cast<Renderer *>(ctx)->render(); }
 
 // ---------------------------------------------------------------------------
@@ -221,7 +243,7 @@ int main() {
 
     // 1. NSApplication (regular policy => dock + menu bar)
     id app = NSApp();
-    send<void>(app, sel_registerName("setActivationPolicy:"), (NSInteger)0);
+    send<void>(app, sel_registerName("setActivationPolicy:"), (NS::Integer)0);
     send<void>(app, sel_registerName("setDelegate:"), createAppDelegate());
 
     // 2. Window + content view
@@ -230,7 +252,7 @@ int main() {
     id view = createView(frame);
     send<void>(win, sel_registerName("setContentView:"), view);
 
-    // 3. CAMetalLayer on the view
+    // 3. CAMetalLayer attached to the view
     CA::MetalLayer *layer = CA::MetalLayer::layer();
     send<void>(view, sel_registerName("setLayer:"), (id)layer);
 
@@ -241,7 +263,7 @@ int main() {
         return 1;
     }
 
-    // 5. ~60 fps timer on the main queue (function-pointer variant; no blocks)
+    // 5. ~60 fps timer on the main queue
     dispatch_source_t timer = dispatch_source_create(
         DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
     dispatch_source_set_timer(timer, dispatch_time(DISPATCH_TIME_NOW, 0),
