@@ -28,6 +28,8 @@
 
 - Loading them (via MTLLibrary, function stitching etc.) is perfectly safe, it is similar to dynamic linking. The restrictions that e.g. libloading::Library::new labours under do not apply, since there are no ctors in the [Metal Shading Language (see section 4.2)](https://developer.apple.com/metal/Metal-Shading-Language-Specification.pdf)
 - https://lib.rs/crates/objc2-metal
+- https://crates.io/crates/objc2-metal
+- https://github.com/madsmtm/objc2
 
 # Metal-cpp를 통해 C++로 Metal 프로그래밍
 - [wwdc22에서 Metal-cpp를 통해 C++로 Metal 프로그래밍을(를) 확인하십시오.apple devw자료2022년](https://developer.apple.com/kr/videos/play/wwdc2022/10160)
