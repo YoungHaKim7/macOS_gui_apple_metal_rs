@@ -1,0 +1,14 @@
+[package]
+name = "clock"
+version = "0.1.0"
+description = "An analog clock using cocoa-rs + core-graphics: custom NSView + NSTimer"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+cocoa.workspace = true
+objc.workspace = true
+
+# Run with:  cargo run -p clock
+

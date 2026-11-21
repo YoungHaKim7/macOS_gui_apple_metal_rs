@@ -1,0 +1,11 @@
+[package]
+name = "notepad"
+version = "0.1.0"
+description = "A minimal macOS notepad using cocoa-rs: a window with an editable text view"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+cocoa.workspace = true
+objc.workspace = true

@@ -1,0 +1,11 @@
+[package]
+name = "calculator"
+version = "0.1.0"
+description = "A macOS calculator using cocoa-rs: NSTextField display + grid of NSButtons"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+cocoa.workspace = true
+objc.workspace = true

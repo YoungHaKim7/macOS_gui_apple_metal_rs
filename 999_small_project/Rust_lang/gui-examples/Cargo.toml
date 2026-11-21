@@ -1,0 +1,50 @@
+[package]
+version = "0.1.0"
+edition = "2024"
+name = "gui-examples"
+
+[workspace.package]
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.100.0"
+
+[workspace]
+resolver = "3"
+members = [
+    "examples/notepad",
+    "examples/calculator",
+    "examples/snake",
+    "examples/tetris",
+    "examples/todo",
+    "examples/clock",
+]
+
+# Each subproject is a standalone binary that uses the `cocoa` crate.
+# All six live under `examples/`. Run any of them from the workspace root:
+#     cargo run -p notepad
+#     cargo run -p calculator
+#     cargo run -p snake
+#     cargo run -p tetris
+#     cargo run -p todo
+#     cargo run -p clock
+#
+# Or, since the binary name matches the package name, you can also use:
+#     cargo run --bin notepad
+#
+# IMPORTANT: these examples only compile and run on macOS because the
+# `cocoa` crate wraps Apple's Cocoa frameworks, which exist only on macOS.
+
+
+[workspace.dependencies]
+# Versions chosen to match what the core-foundation-rs workspace uses
+# internally (see its top-level Cargo.toml). These versions are known to be
+# published on crates.io and to work together.
+#
+# If you want to use the local source from the core-foundation-rs zip
+# instead, replace each line with a `path` dependency, e.g.:
+#     cocoa = { path = "../../upload/core-foundation-rs-extracted/core-foundation-rs-main/cocoa" }
+cocoa = "0.25"
+core-foundation = "0.10"
+core-graphics = "0.25"
+objc = "0.2"
+libc = "0.2" 

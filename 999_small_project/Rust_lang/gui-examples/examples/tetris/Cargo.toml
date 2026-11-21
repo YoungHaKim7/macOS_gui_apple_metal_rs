@@ -1,0 +1,14 @@
+[package]
+name = "tetris"
+version = "0.1.0"
+description = "Tetris game using cocoa-rs: custom NSView + NSTimer"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+cocoa.workspace = true
+objc.workspace = true
+
+# Run with:  cargo run -p tetris
+

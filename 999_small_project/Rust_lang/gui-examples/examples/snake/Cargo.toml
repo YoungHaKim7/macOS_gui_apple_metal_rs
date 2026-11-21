@@ -1,0 +1,12 @@
+[package]
+name = "snake"
+version = "0.1.0"
+description = "Snake game using cocoa-rs: custom NSView + NSTimer for game loop"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+cocoa.workspace = true
+objc.workspace = true
+libc.workspace = true
