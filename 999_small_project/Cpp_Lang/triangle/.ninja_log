@@ -1,0 +1,8 @@
+# ninja log v7
+0	92	1795238383106062741	CMakeFiles/triangle.dir/src/implementation.cpp.o.ddi	cd66678d6552d01d
+0	95	1795238383105857115	CMakeFiles/triangle.dir/src/main.cpp.o.ddi	b0217944bdccefa8
+95	102	1795238383207485044	CMakeFiles/triangle.dir/CXX.dd	c65bfab683bc02e2
+95	102	1795238383207485044	CMakeFiles/triangle.dir/CXXModules.json	c65bfab683bc02e2
+95	102	1795238383207485044	CMakeFiles/triangle.dir/src/main.cpp.o.modmap	c65bfab683bc02e2
+95	102	1795238383207485044	CMakeFiles/triangle.dir/src/implementation.cpp.o.modmap	c65bfab683bc02e2
+102	386	1795238383208145296	CMakeFiles/triangle.dir/src/implementation.cpp.o	b9be1763ee358b3c

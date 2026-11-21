@@ -1,0 +1,15 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=git
+command=/opt/homebrew/bin/cmake;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;/Users/gy/my_projects/Rust_lang/macOS_gui_apple_metal_rs/999_small_project/Cpp_Lang/triangle/CMakeFiles/fc-tmp/metal_cpp/metal_cpp-gitclone.cmake
+source_dir=/Users/gy/my_projects/Rust_lang/macOS_gui_apple_metal_rs/999_small_project/Cpp_Lang/triangle/include/metal-cpp
+work_dir=/Users/gy/my_projects/Rust_lang/macOS_gui_apple_metal_rs/999_small_project/Cpp_Lang/triangle/include
+repository=https://github.com/apple/metal-cpp.git
+remote=origin
+init_submodules=TRUE
+recurse_submodules=--recursive
+submodules=
+CMP0097=NEW
+      
