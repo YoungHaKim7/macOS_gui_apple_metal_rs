@@ -110,6 +110,10 @@ Two small notes:
 
 With the three `-framework` flags added, `just cr` should link cleanly. When you later add MetalFX (`MetalFX/MetalFX.hpp`), add `-framework MetalFX` the same way.
 
+For clangd, run `just clangd` to generate `target/compile_commands.json`. The
+workspace `.clangd` file points clangd at that database; if the editor was
+already open, restart its clangd language server after the database is generated.
+
 <hr />
 
 # justfile(Metal-cpp version)
