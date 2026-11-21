@@ -79,25 +79,16 @@ struct Renderer {
 
         queue = device->newCommandQueue();
 
-        // Compile shaders from source. The current metal-cpp main branch
-        // exposes only the block-based overload:
-        //   newLibraryWithSource(src, opts, SourceErrorHandler)
-        // SourceErrorHandler is a clang Block type, which -pedantic-errors
-        // rejects. Suppress -Wpedantic locally so the block compiles.
+        // Compile shaders from source and report any compiler diagnostics.
         NS::String *src =
             NS::String::string(kShaderSrc, NS::UTF8StringEncoding);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpedantic"
-        MTL::SourceErrorHandler handler = ^(NS::Integer, NS::Error *err) {
-          if (err) {
-              std::printf("shader compile error: %s\n",
-                          err->localizedDescription()->utf8String());
-          }
-        };
-        library = device->newLibraryWithSource(src, nullptr, handler);
-#pragma clang diagnostic pop
+        NS::Error *shaderError = nullptr;
+        library = device->newLibrary(src, nullptr, &shaderError);
         if (!library) {
-            std::puts("failed to compile shader library");
+            std::printf("shader compile error: %s\n",
+                        shaderError
+                            ? shaderError->localizedDescription()->utf8String()
+                            : "(unknown)");
             return false;
         }
 
