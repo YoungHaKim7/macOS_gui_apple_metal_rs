@@ -8,13 +8,15 @@
 //!
 //! Run with: `cargo run -p notepad`
 
-use cocoa::appkit::{
-    NSApp, NSApplication, NSApplicationActivateIgnoringOtherApps,
-    NSApplicationActivationPolicyRegular, NSAutoresizingMaskOptions, NSBackingStoreBuffered,
-    NSMenu, NSMenuItem, NSRunningApplication, NSView, NSWindow, NSWindowStyleMask,
+use cocoa::{
+    appkit::{
+        NSApp, NSApplication, NSApplicationActivateIgnoringOtherApps,
+        NSApplicationActivationPolicyRegular, NSAutoresizingMaskOptions, NSBackingStoreBuffered,
+        NSMenu, NSMenuItem, NSRunningApplication, NSView, NSWindow, NSWindowStyleMask,
+    },
+    base::{NO, YES, id, nil, selector},
+    foundation::{NSAutoreleasePool, NSPoint, NSProcessInfo, NSRect, NSSize, NSString},
 };
-use cocoa::base::{NO, YES, id, nil, selector};
-use cocoa::foundation::{NSAutoreleasePool, NSPoint, NSProcessInfo, NSRect, NSSize, NSString};
 // `msg_send!`, `sel!`, `sel_impl!` are macros from the `objc` crate.
 // `msg_send![obj, setFoo: arg]` expands to a call to `objc_msgSend` with
 // a selector registered via `sel!(setFoo:)`.
