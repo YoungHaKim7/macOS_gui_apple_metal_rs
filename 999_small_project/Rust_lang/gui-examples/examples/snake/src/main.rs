@@ -15,20 +15,22 @@
 //!
 //! Run with: `cargo run -p snake`
 
-use cocoa::appkit::{
-    NSApp, NSApplication, NSApplicationActivateIgnoringOtherApps,
-    NSApplicationActivationPolicyRegular, NSAutoresizingMaskOptions, NSBackingStoreBuffered,
-    NSMenu, NSMenuItem, NSRunningApplication, NSView, NSWindow, NSWindowStyleMask,
+use cocoa::{
+    appkit::{
+        NSApp, NSApplication, NSApplicationActivateIgnoringOtherApps,
+        NSApplicationActivationPolicyRegular, NSAutoresizingMaskOptions, NSBackingStoreBuffered,
+        NSMenu, NSMenuItem, NSRunningApplication, NSView, NSWindow, NSWindowStyleMask,
+    },
+    base::{NO, YES, id, nil, selector},
+    foundation::{NSAutoreleasePool, NSPoint, NSProcessInfo, NSRect, NSSize, NSString},
 };
-use cocoa::base::{NO, YES, id, nil, selector};
-use cocoa::foundation::{NSAutoreleasePool, NSPoint, NSProcessInfo, NSRect, NSSize, NSString};
-use objc::declare::ClassDecl;
-use objc::runtime::{Class, Object, Sel};
-use objc::{class, msg_send, sel, sel_impl};
-use std::cell::RefCell;
-use std::ffi::CString;
-use std::sync::Once;
-use std::time::Instant;
+use objc::{
+    declare::ClassDecl,
+    runtime::{Class, Object, Sel},
+    {class, msg_send, sel, sel_impl},
+};
+
+use std::{cell::RefCell, sync::Once, time::Instant};
 
 // Grid configuration
 const GRID_W: i32 = 30;
