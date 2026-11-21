@@ -22,7 +22,7 @@ use cocoa::appkit::{
     NSApplicationActivationPolicyRegular, NSAutoresizingMaskOptions, NSBackingStoreBuffered,
     NSMenu, NSMenuItem, NSRunningApplication, NSView, NSWindow, NSWindowStyleMask,
 };
-use cocoa::base::{id, nil, selector, NO, YES};
+use cocoa::base::{NO, YES, id, nil, selector};
 use cocoa::foundation::{NSAutoreleasePool, NSPoint, NSProcessInfo, NSRect, NSSize, NSString};
 use objc::declare::ClassDecl;
 use objc::runtime::{Class, Object, Sel};

@@ -8,18 +8,24 @@
 //!
 //! Run with: `cargo run -p clock`
 
-use cocoa::appkit::{
-    NSApp, NSApplication, NSApplicationActivateIgnoringOtherApps,
-    NSApplicationActivationPolicyRegular, NSAutoresizingMaskOptions, NSBackingStoreBuffered,
-    NSMenu, NSMenuItem, NSRunningApplication, NSView, NSWindow, NSWindowStyleMask,
+use cocoa::{
+    appkit::{
+        NSApp, NSApplication, NSApplicationActivateIgnoringOtherApps,
+        NSApplicationActivationPolicyRegular, NSAutoresizingMaskOptions, NSBackingStoreBuffered,
+        NSMenu, NSMenuItem, NSRunningApplication, NSView, NSWindow, NSWindowStyleMask,
+    },
+    base::{NO, YES, id, nil, selector},
+    foundation::{NSAutoreleasePool, NSPoint, NSProcessInfo, NSRect, NSSize, NSString},
 };
-use cocoa::base::{id, nil, selector, NO, YES};
-use cocoa::foundation::{NSAutoreleasePool, NSPoint, NSProcessInfo, NSRect, NSSize, NSString};
-use objc::declare::ClassDecl;
-use objc::runtime::{Class, Object, Sel};
-use objc::{class, msg_send, sel, sel_impl};
-use std::sync::Once;
-use std::time::{SystemTime, UNIX_EPOCH};
+use objc::{
+    declare::ClassDecl,
+    runtime::{Class, Object, Sel},
+    {class, msg_send, sel, sel_impl},
+};
+use std::{
+    sync::Once,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 const VIEW_WIDTH_SIZABLE: NSAutoresizingMaskOptions = 2;
 const VIEW_HEIGHT_SIZABLE: NSAutoresizingMaskOptions = 16;
@@ -124,7 +130,7 @@ extern "C" fn draw_rect(_this: &Object, _cmd: Sel, _dirty: NSRect) {
         let black: id = msg_send![class!(NSColor), blackColor];
         let _: () = msg_send![black, set];
         let _: () = msg_send![cls, strokeRect: bounds]; // dummy to ensure path exists
-                                                        // Use NSBezierPath's bezierPathWithOvalInRect: for the face outline.
+        // Use NSBezierPath's bezierPathWithOvalInRect: for the face outline.
         let face_rect = NSRect::new(
             NSPoint::new(cx - radius, cy - radius),
             NSSize::new(radius * 2.0, radius * 2.0),
