@@ -858,7 +858,7 @@ In `core-foundation-rs`, you'll see `Option<T>` everywhere a Core Foundation fun
 
 ### Rust
 
-```
+```rust
 // File: src/lib.rs
 pub mod array;            // pulls in src/array.rs
 pub mod string;           // pulls in src/string.rs
