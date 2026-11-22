@@ -12,7 +12,10 @@
 - https://github.com/servo/core-foundation-rs
 
 ## metal-cpp-> 러스트로 만든거
-- https://github.com/gamesir-labs/Metal-Rust
+- 내가 만든거(unsafe & FFI & ABI)ver.
+  - https://github.com/YoungHaKim7/metal-cpp-rs
+- safe rust version(외국사람꺼)
+  - https://github.com/gamesir-labs/Metal-Rust
 
 # Metal Documentation
 - https://developer.apple.com/documentation/metal
