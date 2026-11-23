@@ -1,6 +1,9 @@
 # apple 공식 코드
 - https://github.com/apple/metal-cpp
 
+# (영상모아보기xcode이용) macOS Metal with C++ | GetIntoGameDev
+- https://youtube.com/playlist?list=PLn3eTxaOtL2N8v1zUWS1fxaQVI3L3wG0w&si=5KTgn9iUgWiXSgBh
+
 # C++코드
 - https://metaltutorial.com/
   - This tutorial will teach you the basics of Apple's Metal Graphics and Compute API, and help you understand how to program with it in C++ via the metal-cpp library that Apple has now officially released. 
