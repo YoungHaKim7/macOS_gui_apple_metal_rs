@@ -1,8 +1,9 @@
 # apple 공식 코드
 - https://github.com/apple/metal-cpp
 
-# (영상모아보기xcode이용) macOS Metal with C++ | GetIntoGameDev
-- https://youtube.com/playlist?list=PLn3eTxaOtL2N8v1zUWS1fxaQVI3L3wG0w&si=5KTgn9iUgWiXSgBh
+# 해외 외국인 영상 유튜브 영상들
+- [(영상모아보기xcode이용) macOS Metal with C++ | GetIntoGameDev](https://youtube.com/playlist?list=PLn3eTxaOtL2N8v1zUWS1fxaQVI3L3wG0w&si=5KTgn9iUgWiXSgBh)
+- [(영상모아보기)Apple Metal API | GPU Programming | Computer Graphics | Ray Tracing | Cuda Education | seamlessblend](https://youtube.com/playlist?list=PLNhdAzzsGnqN5rx1wkKrugLHp-N6GcjmT&si=pwXiqjedCsDSe1MO)
 
 # C++코드
 - https://metaltutorial.com/
