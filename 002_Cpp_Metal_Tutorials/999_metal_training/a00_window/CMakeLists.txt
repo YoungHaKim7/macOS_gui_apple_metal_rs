@@ -23,11 +23,11 @@ project(${ProjectId} LANGUAGES CXX)
 #       headers are included as SYSTEM below (verified: suppression works
 #       even under -pedantic-errors / -Werror).
 add_compile_options(
-    -pedantic-errors
-    -pthread
+    # -pedantic-errors
+    # -pthread
     -Wall
     -Wextra
-    -ggdb
+    # -ggdb
 )
 
 # Main executable with C++ sources
