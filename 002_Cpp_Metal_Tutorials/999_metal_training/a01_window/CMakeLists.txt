@@ -48,15 +48,15 @@ if(APPLE)
 endif()
 
 # ---- Fetch metal-cpp into include/metal-cpp ----
-include(FetchContent)
+# include(FetchContent)
 
-FetchContent_Declare(
-    metal_cpp
-    GIT_REPOSITORY https://github.com/apple/metal-cpp.git
-    GIT_TAG        main
-    SOURCE_DIR     "${CMAKE_CURRENT_SOURCE_DIR}/include/metal-cpp"
-)
-FetchContent_MakeAvailable(metal_cpp)
+# FetchContent_Declare(
+#     metal_cpp
+#     GIT_REPOSITORY https://github.com/apple/metal-cpp.git
+#     GIT_TAG        main
+#     SOURCE_DIR     "${CMAKE_CURRENT_SOURCE_DIR}/include/metal-cpp"
+# )
+# FetchContent_MakeAvailable(metal_cpp)
 
 # SYSTEM => all diagnostics originating inside Apple's headers (anonymous
 # structs in MTLAccelerationStructureTypes.hpp etc.) are suppressed.
