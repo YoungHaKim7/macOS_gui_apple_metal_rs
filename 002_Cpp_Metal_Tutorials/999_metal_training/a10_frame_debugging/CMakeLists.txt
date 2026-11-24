@@ -42,8 +42,11 @@ if(APPLE)
     find_library(METAL_FW      Metal      REQUIRED)
     find_library(FOUNDATION_FW Foundation REQUIRED)
     find_library(QUARTZCORE_FW QuartzCore REQUIRED)
+    find_library(APPKIT_FW     AppKit     REQUIRED)
+    find_library(METALKIT_FW   MetalKit   REQUIRED)
     target_link_libraries(${ProjectId} PRIVATE
         ${METAL_FW} ${FOUNDATION_FW} ${QUARTZCORE_FW}
+        ${APPKIT_FW} ${METALKIT_FW}
     )
 endif()
 
@@ -70,6 +73,12 @@ target_include_directories(${ProjectId} SYSTEM PRIVATE
 # Foundation  -> NS*ErrorDomain, NS*Notification, objc_getProtocol/lookUpClass,
 #                sel_registerName (libobjc is re-exported via Foundation)
 # QuartzCore  -> CA::MetalLayer, needed as soon as you render into a view
+# AppKit      -> NSApplication/NSWindow/NSMenu/NSMenuItem
+# MetalKit    -> MTKView
+#                metal-cpp-extensions resolves these classes with
+#                objc_lookUpClass() at load time, so the images must be in the
+#                load commands. Without them the binary still links, but every
+#                lookup yields Nil and the app exits at once, showing nothing.
 # ---- Link the frameworks metal-cpp wraps ----
 # SHELL: prefix prevents CMake from de-duplicating the repeated "-framework"
 # token (which broke the link line: "-framework Metal Foundation QuartzCore").
@@ -78,7 +87,19 @@ if(APPLE)
         "SHELL:-framework Metal"
         "SHELL:-framework Foundation"
         "SHELL:-framework QuartzCore"
+        "SHELL:-framework AppKit"
+        "SHELL:-framework MetalKit"
     )
+endif()
+
+# ---- Embed Info.plist (programmatic GPU capture) ----
+# A bare executable has no bundle, so the capture manager only enables itself
+# when it finds MetalCaptureEnabled in an embedded plist section. Without it
+# supportsDestination() is false and triggerCapture() asserts ~3 s after launch.
+# Same trick as LearnMetalCPP/Makefile: -sectcreate __TEXT __info_plist <plist>
+if(APPLE)
+    target_link_options(${ProjectId} PRIVATE
+        "SHELL:-sectcreate __TEXT __info_plist \"${CMAKE_CURRENT_SOURCE_DIR}/Info.plist\"")
 endif()
 
 # Output directory

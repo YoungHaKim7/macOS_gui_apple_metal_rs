@@ -21,8 +21,8 @@
 #define MTL_PRIVATE_IMPLEMENTATION
 #define MTK_PRIVATE_IMPLEMENTATION
 #define CA_PRIVATE_IMPLEMENTATION
-#include <Metal/Metal.hpp>
 #include <AppKit/AppKit.hpp>
+#include <Metal/Metal.hpp>
 #include <MetalKit/MetalKit.hpp>
 
 #include <simd/simd.h>
@@ -30,72 +30,70 @@
 static constexpr size_t kNumInstances = 32;
 static constexpr size_t kMaxFramesInFlight = 3;
 
-
 #pragma region Declarations {
 
-class Renderer
-{
-    public:
-        Renderer( MTL::Device* pDevice );
-        ~Renderer();
-        void buildShaders();
-        void buildBuffers();
-        void draw( MTK::View* pView );
+class Renderer {
+  public:
+    Renderer(MTL::Device *pDevice);
+    ~Renderer();
+    void buildShaders();
+    void buildBuffers();
+    void draw(MTK::View *pView);
 
-    private:
-        MTL::Device* _pDevice;
-        MTL::CommandQueue* _pCommandQueue;
-        MTL::Library* _pShaderLibrary;
-        MTL::RenderPipelineState* _pPSO;
-        MTL::Buffer* _pVertexDataBuffer;
-        MTL::Buffer* _pInstanceDataBuffer[kMaxFramesInFlight];
-        MTL::Buffer* _pIndexBuffer;
-        float _angle;
-        int _frame;
-        dispatch_semaphore_t _semaphore;
-        static const int kMaxFramesInFlight;
+  private:
+    MTL::Device *_pDevice;
+    MTL::CommandQueue *_pCommandQueue;
+    MTL::Library *_pShaderLibrary;
+    MTL::RenderPipelineState *_pPSO;
+    MTL::Buffer *_pVertexDataBuffer;
+    MTL::Buffer *_pInstanceDataBuffer[kMaxFramesInFlight];
+    MTL::Buffer *_pIndexBuffer;
+    float _angle;
+    int _frame;
+    dispatch_semaphore_t _semaphore;
+    static const int kMaxFramesInFlight;
 };
 
-class MyMTKViewDelegate : public MTK::ViewDelegate
-{
-    public:
-        MyMTKViewDelegate( MTL::Device* pDevice );
-        virtual ~MyMTKViewDelegate() override;
-        virtual void drawInMTKView( MTK::View* pView ) override;
+class MyMTKViewDelegate : public MTK::ViewDelegate {
+  public:
+    MyMTKViewDelegate(MTL::Device *pDevice);
+    virtual ~MyMTKViewDelegate() override;
+    virtual void drawInMTKView(MTK::View *pView) override;
 
-    private:
-        Renderer* _pRenderer;
+  private:
+    Renderer *_pRenderer;
 };
 
-class MyAppDelegate : public NS::ApplicationDelegate
-{
-    public:
-        ~MyAppDelegate();
+class MyAppDelegate : public NS::ApplicationDelegate {
+  public:
+    ~MyAppDelegate();
 
-        NS::Menu* createMenuBar();
+    NS::Menu *createMenuBar();
 
-        virtual void applicationWillFinishLaunching( NS::Notification* pNotification ) override;
-        virtual void applicationDidFinishLaunching( NS::Notification* pNotification ) override;
-        virtual bool applicationShouldTerminateAfterLastWindowClosed( NS::Application* pSender ) override;
+    virtual void
+    applicationWillFinishLaunching(NS::Notification *pNotification) override;
+    virtual void
+    applicationDidFinishLaunching(NS::Notification *pNotification) override;
+    virtual bool applicationShouldTerminateAfterLastWindowClosed(
+        NS::Application *pSender) override;
 
-    private:
-        NS::Window* _pWindow;
-        MTK::View* _pMtkView;
-        MTL::Device* _pDevice;
-        MyMTKViewDelegate* _pViewDelegate = nullptr;
+  private:
+    NS::Window *_pWindow = nullptr;
+    MTK::View *_pMtkView = nullptr;
+    MTL::Device *_pDevice = nullptr;
+    MyMTKViewDelegate *_pViewDelegate = nullptr;
 };
 
 #pragma endregion Declarations }
 
-
-int main( int argc, char* argv[] )
-{
-    NS::AutoreleasePool* pAutoreleasePool = NS::AutoreleasePool::alloc()->init();
+int main(int, char *[]) {
+    NS::AutoreleasePool *pAutoreleasePool =
+        NS::AutoreleasePool::alloc()->init();
 
     MyAppDelegate del;
 
-    NS::Application* pSharedApplication = NS::Application::sharedApplication();
-    pSharedApplication->setDelegate( &del );
+    NS::Application *pSharedApplication = NS::Application::sharedApplication();
+    pSharedApplication->setDelegate(&del);
     pSharedApplication->run();
 
     pAutoreleasePool->release();
@@ -103,51 +101,58 @@ int main( int argc, char* argv[] )
     return 0;
 }
 
-
 #pragma mark - AppDelegate
 #pragma region AppDelegate {
 
-MyAppDelegate::~MyAppDelegate()
-{
+MyAppDelegate::~MyAppDelegate() {
     _pMtkView->release();
     _pWindow->release();
     _pDevice->release();
     delete _pViewDelegate;
 }
 
-NS::Menu* MyAppDelegate::createMenuBar()
-{
+NS::Menu *MyAppDelegate::createMenuBar() {
     using NS::StringEncoding::UTF8StringEncoding;
 
-    NS::Menu* pMainMenu = NS::Menu::alloc()->init();
-    NS::MenuItem* pAppMenuItem = NS::MenuItem::alloc()->init();
-    NS::Menu* pAppMenu = NS::Menu::alloc()->init( NS::String::string( "Appname", UTF8StringEncoding ) );
+    NS::Menu *pMainMenu = NS::Menu::alloc()->init();
+    NS::MenuItem *pAppMenuItem = NS::MenuItem::alloc()->init();
+    NS::Menu *pAppMenu = NS::Menu::alloc()->init(
+        NS::String::string("Appname", UTF8StringEncoding));
 
-    NS::String* appName = NS::RunningApplication::currentApplication()->localizedName();
-    NS::String* quitItemName = NS::String::string( "Quit ", UTF8StringEncoding )->stringByAppendingString( appName );
-    SEL quitCb = NS::MenuItem::registerActionCallback( "appQuit", [](void*,SEL,const NS::Object* pSender){
-        auto pApp = NS::Application::sharedApplication();
-        pApp->terminate( pSender );
-    } );
+    NS::String *appName =
+        NS::RunningApplication::currentApplication()->localizedName();
+    NS::String *quitItemName = NS::String::string("Quit ", UTF8StringEncoding)
+                                   ->stringByAppendingString(appName);
+    SEL quitCb = NS::MenuItem::registerActionCallback(
+        "appQuit", [](void *, SEL, const NS::Object *pSender) {
+            auto pApp = NS::Application::sharedApplication();
+            pApp->terminate(pSender);
+        });
 
-    NS::MenuItem* pAppQuitItem = pAppMenu->addItem( quitItemName, quitCb, NS::String::string( "q", UTF8StringEncoding ) );
-    pAppQuitItem->setKeyEquivalentModifierMask( NS::EventModifierFlagCommand );
-    pAppMenuItem->setSubmenu( pAppMenu );
+    NS::MenuItem *pAppQuitItem = pAppMenu->addItem(
+        quitItemName, quitCb, NS::String::string("q", UTF8StringEncoding));
+    pAppQuitItem->setKeyEquivalentModifierMask(NS::EventModifierFlagCommand);
+    pAppMenuItem->setSubmenu(pAppMenu);
 
-    NS::MenuItem* pWindowMenuItem = NS::MenuItem::alloc()->init();
-    NS::Menu* pWindowMenu = NS::Menu::alloc()->init( NS::String::string( "Window", UTF8StringEncoding ) );
+    NS::MenuItem *pWindowMenuItem = NS::MenuItem::alloc()->init();
+    NS::Menu *pWindowMenu = NS::Menu::alloc()->init(
+        NS::String::string("Window", UTF8StringEncoding));
 
-    SEL closeWindowCb = NS::MenuItem::registerActionCallback( "windowClose", [](void*, SEL, const NS::Object*){
-        auto pApp = NS::Application::sharedApplication();
-            pApp->windows()->object< NS::Window >(0)->close();
-    } );
-    NS::MenuItem* pCloseWindowItem = pWindowMenu->addItem( NS::String::string( "Close Window", UTF8StringEncoding ), closeWindowCb, NS::String::string( "w", UTF8StringEncoding ) );
-    pCloseWindowItem->setKeyEquivalentModifierMask( NS::EventModifierFlagCommand );
+    SEL closeWindowCb = NS::MenuItem::registerActionCallback(
+        "windowClose", [](void *, SEL, const NS::Object *) {
+            auto pApp = NS::Application::sharedApplication();
+            pApp->windows()->object<NS::Window>(0)->close();
+        });
+    NS::MenuItem *pCloseWindowItem = pWindowMenu->addItem(
+        NS::String::string("Close Window", UTF8StringEncoding), closeWindowCb,
+        NS::String::string("w", UTF8StringEncoding));
+    pCloseWindowItem->setKeyEquivalentModifierMask(
+        NS::EventModifierFlagCommand);
 
-    pWindowMenuItem->setSubmenu( pWindowMenu );
+    pWindowMenuItem->setSubmenu(pWindowMenu);
 
-    pMainMenu->addItem( pAppMenuItem );
-    pMainMenu->addItem( pWindowMenuItem );
+    pMainMenu->addItem(pAppMenuItem);
+    pMainMenu->addItem(pWindowMenuItem);
 
     pAppMenuItem->release();
     pWindowMenuItem->release();
@@ -157,95 +162,83 @@ NS::Menu* MyAppDelegate::createMenuBar()
     return pMainMenu->autorelease();
 }
 
-void MyAppDelegate::applicationWillFinishLaunching( NS::Notification* pNotification )
-{
-    NS::Menu* pMenu = createMenuBar();
-    NS::Application* pApp = reinterpret_cast< NS::Application* >( pNotification->object() );
-    pApp->setMainMenu( pMenu );
-    pApp->setActivationPolicy( NS::ActivationPolicy::ActivationPolicyRegular );
+void MyAppDelegate::applicationWillFinishLaunching(
+    NS::Notification *pNotification) {
+    NS::Menu *pMenu = createMenuBar();
+    NS::Application *pApp =
+        reinterpret_cast<NS::Application *>(pNotification->object());
+    pApp->setMainMenu(pMenu);
+    pApp->setActivationPolicy(NS::ActivationPolicy::ActivationPolicyRegular);
 }
 
-void MyAppDelegate::applicationDidFinishLaunching( NS::Notification* pNotification )
-{
-    CGRect frame = (CGRect){ {100.0, 100.0}, {512.0, 512.0} };
+void MyAppDelegate::applicationDidFinishLaunching(
+    NS::Notification *pNotification) {
+    CGRect frame = CGRect{CGPoint{100.0, 100.0}, CGSize{512.0, 512.0}};
 
     _pWindow = NS::Window::alloc()->init(
-        frame,
-        NS::WindowStyleMaskClosable|NS::WindowStyleMaskTitled,
-        NS::BackingStoreBuffered,
-        false );
+        frame, NS::WindowStyleMaskClosable | NS::WindowStyleMaskTitled,
+        NS::BackingStoreBuffered, false);
 
     _pDevice = MTL::CreateSystemDefaultDevice();
 
-    _pMtkView = MTK::View::alloc()->init( frame, _pDevice );
-    _pMtkView->setColorPixelFormat( MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB );
-    _pMtkView->setClearColor( MTL::ClearColor::Make( 1.0, 0.0, 0.0, 1.0 ) );
+    _pMtkView = MTK::View::alloc()->init(frame, _pDevice);
+    _pMtkView->setColorPixelFormat(
+        MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
+    _pMtkView->setClearColor(MTL::ClearColor::Make(1.0, 0.0, 0.0, 1.0));
 
-    _pViewDelegate = new MyMTKViewDelegate( _pDevice );
-    _pMtkView->setDelegate( _pViewDelegate );
+    _pViewDelegate = new MyMTKViewDelegate(_pDevice);
+    _pMtkView->setDelegate(_pViewDelegate);
 
-    _pWindow->setContentView( _pMtkView );
-    _pWindow->setTitle( NS::String::string( "04 - Instancing", NS::StringEncoding::UTF8StringEncoding ) );
+    _pWindow->setContentView(_pMtkView);
+    _pWindow->setTitle(NS::String::string(
+        "04 - Instancing", NS::StringEncoding::UTF8StringEncoding));
 
-    _pWindow->makeKeyAndOrderFront( nullptr );
+    _pWindow->makeKeyAndOrderFront(nullptr);
 
-    NS::Application* pApp = reinterpret_cast< NS::Application* >( pNotification->object() );
-    pApp->activateIgnoringOtherApps( true );
+    NS::Application *pApp =
+        reinterpret_cast<NS::Application *>(pNotification->object());
+    pApp->activateIgnoringOtherApps(true);
 }
 
-bool MyAppDelegate::applicationShouldTerminateAfterLastWindowClosed( NS::Application* pSender )
-{
+bool MyAppDelegate::applicationShouldTerminateAfterLastWindowClosed(
+    NS::Application *) {
     return true;
 }
 
 #pragma endregion AppDelegate }
 
-
 #pragma mark - ViewDelegate
 #pragma region ViewDelegate {
 
-MyMTKViewDelegate::MyMTKViewDelegate( MTL::Device* pDevice )
-: MTK::ViewDelegate()
-, _pRenderer( new Renderer( pDevice ) )
-{
-}
+MyMTKViewDelegate::MyMTKViewDelegate(MTL::Device *pDevice)
+    : MTK::ViewDelegate(), _pRenderer(new Renderer(pDevice)) {}
 
-MyMTKViewDelegate::~MyMTKViewDelegate()
-{
-    delete _pRenderer;
-}
+MyMTKViewDelegate::~MyMTKViewDelegate() { delete _pRenderer; }
 
-void MyMTKViewDelegate::drawInMTKView( MTK::View* pView )
-{
-    _pRenderer->draw( pView );
+void MyMTKViewDelegate::drawInMTKView(MTK::View *pView) {
+    _pRenderer->draw(pView);
 }
 
 #pragma endregion ViewDelegate }
-
 
 #pragma mark - Renderer
 #pragma region Renderer {
 
 const int Renderer::kMaxFramesInFlight = 3;
 
-Renderer::Renderer( MTL::Device* pDevice )
-: _pDevice( pDevice->retain() )
-, _angle ( 0.f )
-, _frame( 0 )
-{
+Renderer::Renderer(MTL::Device *pDevice)
+    : _pDevice(pDevice->retain()), _angle(0.f), _frame(0) {
     _pCommandQueue = _pDevice->newCommandQueue();
     buildShaders();
     buildBuffers();
 
-    _semaphore = dispatch_semaphore_create( Renderer::kMaxFramesInFlight );
+    _semaphore = dispatch_semaphore_create(Renderer::kMaxFramesInFlight);
 }
 
-Renderer::~Renderer()
-{
+Renderer::~Renderer() {
     _pShaderLibrary->release();
     _pVertexDataBuffer->release();
-    for ( int i = 0; i < kMaxFramesInFlight; ++i )
-    {
+    for (int i = 0; i < kMaxFramesInFlight; ++i) {
         _pInstanceDataBuffer[i]->release();
     }
     _pIndexBuffer->release();
@@ -254,20 +247,17 @@ Renderer::~Renderer()
     _pDevice->release();
 }
 
-namespace shader_types
-{
-    struct InstanceData
-    {
-        simd::float4x4 instanceTransform;
-        simd::float4 instanceColor;
-    };
-}
+namespace shader_types {
+struct InstanceData {
+    simd::float4x4 instanceTransform;
+    simd::float4 instanceColor;
+};
+} // namespace shader_types
 
-void Renderer::buildShaders()
-{
+void Renderer::buildShaders() {
     using NS::StringEncoding::UTF8StringEncoding;
 
-    const char* shaderSrc = R"(
+    const char *shaderSrc = R"(
         #include <metal_stdlib>
         using namespace metal;
 
@@ -306,27 +296,30 @@ void Renderer::buildShaders()
         }
     )";
 
-    NS::Error* pError = nullptr;
-    MTL::Library* pLibrary = _pDevice->newLibrary( NS::String::string(shaderSrc, UTF8StringEncoding), nullptr, &pError );
-    if ( !pLibrary )
-    {
-        __builtin_printf( "%s", pError->localizedDescription()->utf8String() );
-        assert( false );
+    NS::Error *pError = nullptr;
+    MTL::Library *pLibrary = _pDevice->newLibrary(
+        NS::String::string(shaderSrc, UTF8StringEncoding), nullptr, &pError);
+    if (!pLibrary) {
+        __builtin_printf("%s", pError->localizedDescription()->utf8String());
+        assert(false);
     }
 
-    MTL::Function* pVertexFn = pLibrary->newFunction( NS::String::string("vertexMain", UTF8StringEncoding) );
-    MTL::Function* pFragFn = pLibrary->newFunction( NS::String::string("fragmentMain", UTF8StringEncoding) );
+    MTL::Function *pVertexFn = pLibrary->newFunction(
+        NS::String::string("vertexMain", UTF8StringEncoding));
+    MTL::Function *pFragFn = pLibrary->newFunction(
+        NS::String::string("fragmentMain", UTF8StringEncoding));
 
-    MTL::RenderPipelineDescriptor* pDesc = MTL::RenderPipelineDescriptor::alloc()->init();
-    pDesc->setVertexFunction( pVertexFn );
-    pDesc->setFragmentFunction( pFragFn );
-    pDesc->colorAttachments()->object(0)->setPixelFormat( MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB );
+    MTL::RenderPipelineDescriptor *pDesc =
+        MTL::RenderPipelineDescriptor::alloc()->init();
+    pDesc->setVertexFunction(pVertexFn);
+    pDesc->setFragmentFunction(pFragFn);
+    pDesc->colorAttachments()->object(0)->setPixelFormat(
+        MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
 
-    _pPSO = _pDevice->newRenderPipelineState( pDesc, &pError );
-    if ( !_pPSO )
-    {
-        __builtin_printf( "%s", pError->localizedDescription()->utf8String() );
-        assert( false );
+    _pPSO = _pDevice->newRenderPipelineState(pDesc, &pError);
+    if (!_pPSO) {
+        __builtin_printf("%s", pError->localizedDescription()->utf8String());
+        assert(false);
     }
 
     pVertexFn->release();
@@ -335,103 +328,109 @@ void Renderer::buildShaders()
     _pShaderLibrary = pLibrary;
 }
 
-void Renderer::buildBuffers()
-{
+void Renderer::buildBuffers() {
     using simd::float3;
 
     const float s = 0.5f;
 
-    float3 verts[] = {
-        { -s, -s, +s },
-        { +s, -s, +s },
-        { +s, +s, +s },
-        { -s, +s, +s }
-    };
+    float3 verts[] = {{-s, -s, +s}, {+s, -s, +s}, {+s, +s, +s}, {-s, +s, +s}};
 
     uint16_t indices[] = {
-        0, 1, 2,
-        2, 3, 0,
+        0, 1, 2, 2, 3, 0,
     };
 
-    const size_t vertexDataSize = sizeof( verts );
-    const size_t indexDataSize = sizeof( indices );
+    const size_t vertexDataSize = sizeof(verts);
+    const size_t indexDataSize = sizeof(indices);
 
-    MTL::Buffer* pVertexBuffer = _pDevice->newBuffer( vertexDataSize, MTL::ResourceStorageModeManaged );
-    MTL::Buffer* pIndexBuffer = _pDevice->newBuffer( indexDataSize, MTL::ResourceStorageModeManaged );
+    MTL::Buffer *pVertexBuffer =
+        _pDevice->newBuffer(vertexDataSize, MTL::ResourceStorageModeManaged);
+    MTL::Buffer *pIndexBuffer =
+        _pDevice->newBuffer(indexDataSize, MTL::ResourceStorageModeManaged);
 
     _pVertexDataBuffer = pVertexBuffer;
     _pIndexBuffer = pIndexBuffer;
 
-    memcpy( _pVertexDataBuffer->contents(), verts, vertexDataSize );
-    memcpy( _pIndexBuffer->contents(), indices, indexDataSize );
+    memcpy(_pVertexDataBuffer->contents(), verts, vertexDataSize);
+    memcpy(_pIndexBuffer->contents(), indices, indexDataSize);
 
-    _pVertexDataBuffer->didModifyRange( NS::Range::Make( 0, _pVertexDataBuffer->length() ) );
-    _pIndexBuffer->didModifyRange( NS::Range::Make( 0, _pIndexBuffer->length() ) );
+    _pVertexDataBuffer->didModifyRange(
+        NS::Range::Make(0, _pVertexDataBuffer->length()));
+    _pIndexBuffer->didModifyRange(NS::Range::Make(0, _pIndexBuffer->length()));
 
-    const size_t instanceDataSize = kMaxFramesInFlight * kNumInstances * sizeof( shader_types::InstanceData );
-    for ( size_t i = 0; i < kMaxFramesInFlight; ++i )
-    {
-        _pInstanceDataBuffer[ i ] = _pDevice->newBuffer( instanceDataSize, MTL::ResourceStorageModeManaged );
+    const size_t instanceDataSize =
+        kMaxFramesInFlight * kNumInstances * sizeof(shader_types::InstanceData);
+    for (size_t i = 0; i < kMaxFramesInFlight; ++i) {
+        _pInstanceDataBuffer[i] = _pDevice->newBuffer(
+            instanceDataSize, MTL::ResourceStorageModeManaged);
     }
 }
 
-void Renderer::draw( MTK::View* pView )
-{
+void Renderer::draw(MTK::View *pView) {
     using simd::float4;
     using simd::float4x4;
 
-    NS::AutoreleasePool* pPool = NS::AutoreleasePool::alloc()->init();
+    NS::AutoreleasePool *pPool = NS::AutoreleasePool::alloc()->init();
+
+    // These can be null when the view is not ready to render.
+    MTL::RenderPassDescriptor *pRpd = pView->currentRenderPassDescriptor();
+    MTL::Drawable *pDrawable = pView->currentDrawable();
+
+    if (pRpd == nullptr || pDrawable == nullptr) {
+        pPool->release();
+        return;
+    }
 
     _frame = (_frame + 1) % Renderer::kMaxFramesInFlight;
-    MTL::Buffer* pInstanceDataBuffer = _pInstanceDataBuffer[ _frame ];
+    MTL::Buffer *pInstanceDataBuffer = _pInstanceDataBuffer[_frame];
 
-    MTL::CommandBuffer* pCmd = _pCommandQueue->commandBuffer();
-    dispatch_semaphore_wait( _semaphore, DISPATCH_TIME_FOREVER );
-    Renderer* pRenderer = this;
-    pCmd->addCompletedHandler( ^void( MTL::CommandBuffer* pCmd ){
-        dispatch_semaphore_signal( pRenderer->_semaphore );
+    MTL::CommandBuffer *pCmd = _pCommandQueue->commandBuffer();
+    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
+    Renderer *pRenderer = this;
+    pCmd->addCompletedHandler(^void(MTL::CommandBuffer *) {
+      dispatch_semaphore_signal(pRenderer->_semaphore);
     });
 
     _angle += 0.01f;
 
     const float scl = 0.1f;
-    shader_types::InstanceData* pInstanceData = reinterpret_cast< shader_types::InstanceData *>( pInstanceDataBuffer->contents() );
-    for ( size_t i = 0; i < kNumInstances; ++i )
-    {
+    shader_types::InstanceData *pInstanceData =
+        reinterpret_cast<shader_types::InstanceData *>(
+            pInstanceDataBuffer->contents());
+    for (size_t i = 0; i < kNumInstances; ++i) {
         float iDivNumInstances = i / (float)kNumInstances;
-        float xoff = (iDivNumInstances * 2.0f - 1.0f) + (1.f/kNumInstances);
-        float yoff = sin( ( iDivNumInstances + _angle ) * 2.0f * M_PI);
-        pInstanceData[ i ].instanceTransform = (float4x4){ (float4){ scl * sinf(_angle), scl * cosf(_angle), 0.f, 0.f },
-                                                           (float4){ scl * cosf(_angle), scl * -sinf(_angle), 0.f, 0.f },
-                                                           (float4){ 0.f, 0.f, scl, 0.f },
-                                                           (float4){ xoff, yoff, 0.f, 1.f } };
+        float xoff = (iDivNumInstances * 2.0f - 1.0f) + (1.f / kNumInstances);
+        float yoff = sin((iDivNumInstances + _angle) * 2.0f * M_PI);
+        pInstanceData[i].instanceTransform =
+            float4x4{float4{scl * sinf(_angle), scl * cosf(_angle), 0.f, 0.f},
+                     float4{scl * cosf(_angle), scl * -sinf(_angle), 0.f, 0.f},
+                     float4{0.f, 0.f, scl, 0.f}, float4{xoff, yoff, 0.f, 1.f}};
 
         float r = iDivNumInstances;
         float g = 1.0f - r;
-        float b = sinf( M_PI * 2.0f * iDivNumInstances );
-        pInstanceData[ i ].instanceColor = (float4){ r, g, b, 1.0f };
+        float b = sinf(M_PI * 2.0f * iDivNumInstances);
+        pInstanceData[i].instanceColor = float4{r, g, b, 1.0f};
     }
-    pInstanceDataBuffer->didModifyRange( NS::Range::Make( 0, pInstanceDataBuffer->length() ) );
+    pInstanceDataBuffer->didModifyRange(
+        NS::Range::Make(0, pInstanceDataBuffer->length()));
 
+    MTL::RenderCommandEncoder *pEnc = pCmd->renderCommandEncoder(pRpd);
 
-    MTL::RenderPassDescriptor* pRpd = pView->currentRenderPassDescriptor();
-    MTL::RenderCommandEncoder* pEnc = pCmd->renderCommandEncoder( pRpd );
-
-    pEnc->setRenderPipelineState( _pPSO );
-    pEnc->setVertexBuffer( _pVertexDataBuffer, /* offset */ 0, /* index */ 0 );
-    pEnc->setVertexBuffer( pInstanceDataBuffer, /* offset */ 0, /* index */ 1 );
+    pEnc->setRenderPipelineState(_pPSO);
+    pEnc->setVertexBuffer(_pVertexDataBuffer, /* offset */ 0, /* index */ 0);
+    pEnc->setVertexBuffer(pInstanceDataBuffer, /* offset */ 0, /* index */ 1);
 
     //
-    // void drawIndexedPrimitives( PrimitiveType primitiveType, NS::UInteger indexCount, IndexType indexType,
-    //                             const class Buffer* pIndexBuffer, NS::UInteger indexBufferOffset, NS::UInteger instanceCount );
-    pEnc->drawIndexedPrimitives( MTL::PrimitiveType::PrimitiveTypeTriangle,
-                                6, MTL::IndexType::IndexTypeUInt16,
-                                _pIndexBuffer,
-                                0,
-                                kNumInstances );
+    // void drawIndexedPrimitives( PrimitiveType primitiveType, NS::UInteger
+    // indexCount, IndexType indexType,
+    //                             const class Buffer* pIndexBuffer,
+    //                             NS::UInteger indexBufferOffset, NS::UInteger
+    //                             instanceCount );
+    pEnc->drawIndexedPrimitives(MTL::PrimitiveType::PrimitiveTypeTriangle, 6,
+                                MTL::IndexType::IndexTypeUInt16, _pIndexBuffer,
+                                0, kNumInstances);
 
     pEnc->endEncoding();
-    pCmd->presentDrawable( pView->currentDrawable() );
+    pCmd->presentDrawable(pDrawable);
     pCmd->commit();
 
     pPool->release();
