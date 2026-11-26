@@ -16,6 +16,7 @@
  */
 
 #include <cassert>
+#include <cstdio>
 
 #define NS_PRIVATE_IMPLEMENTATION
 #define MTL_PRIVATE_IMPLEMENTATION
@@ -70,7 +71,7 @@ class MyAppDelegate : public NS::ApplicationDelegate {
 
 #pragma endregion Declarations }
 
-int main(int argc, char *argv[]) {
+int main() {
     NS::AutoreleasePool *pAutoreleasePool =
         NS::AutoreleasePool::alloc()->init();
 
@@ -88,12 +89,6 @@ int main(int argc, char *argv[]) {
 #pragma mark - AppDelegate
 #pragma region AppDelegate {
 
-// MyAppDelegate::~MyAppDelegate() {
-//     _pMtkView->release();
-//     _pWindow->release();
-//     _pDevice->release();
-//     delete _pViewDelegate;
-// }
 MyAppDelegate::~MyAppDelegate() {
     if (_pViewDelegate != nullptr) {
         delete _pViewDelegate;
@@ -175,7 +170,7 @@ NS::Menu *MyAppDelegate::createMenuBar() {
 //     pApp->setMainMenu(pMenu);
 //     pApp->setActivationPolicy(NS::ActivationPolicy::ActivationPolicyRegular);
 // }
-#include <cstdio>
+
 void MyAppDelegate::applicationDidFinishLaunching(
     NS::Notification *pNotification) {
 
@@ -194,7 +189,6 @@ void MyAppDelegate::applicationDidFinishLaunching(
     _pDevice = MTL::CreateSystemDefaultDevice();
 
     if (_pDevice == nullptr) {
-        // NSLog("Metal device is not available.");
         std::fprintf(stderr, "Metal device is not available.\n");
         return;
     }
@@ -203,9 +197,7 @@ void MyAppDelegate::applicationDidFinishLaunching(
     _pMtkView = MTK::View::alloc()->init(frame, _pDevice);
 
     if (_pMtkView == nullptr) {
-        // NSLog("Failed to create MTKView.");
         std::fprintf(stderr, "Failed to create MTKView.\n");
-
         return;
     }
 
@@ -234,37 +226,8 @@ void MyAppDelegate::applicationDidFinishLaunching(
     pApp->activateIgnoringOtherApps(true);
 }
 
-void MyAppDelegate::applicationDidFinishLaunching(
-    NS::Notification *pNotification) {
-    // CGRect frame = (CGRect){{100.0, 100.0}, {512.0, 512.0}};
-    CGRect frame{CGPoint{100.0, 100.0}, CGSize{512.0, 512.0}};
-    _pWindow = NS::Window::alloc()->init(
-        frame, NS::WindowStyleMaskClosable | NS::WindowStyleMaskTitled,
-        NS::BackingStoreBuffered, false);
-
-    _pDevice = MTL::CreateSystemDefaultDevice();
-
-    _pMtkView = MTK::View::alloc()->init(frame, _pDevice);
-    _pMtkView->setColorPixelFormat(
-        MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
-    _pMtkView->setClearColor(MTL::ClearColor::Make(1.0, 0.0, 0.0, 1.0));
-
-    _pViewDelegate = new MyMTKViewDelegate(_pDevice);
-    _pMtkView->setDelegate(_pViewDelegate);
-
-    _pWindow->setContentView(_pMtkView);
-    _pWindow->setTitle(NS::String::string(
-        "00 - Window", NS::StringEncoding::UTF8StringEncoding));
-
-    _pWindow->makeKeyAndOrderFront(nullptr);
-
-    NS::Application *pApp =
-        reinterpret_cast<NS::Application *>(pNotification->object());
-    pApp->activateIgnoringOtherApps(true);
-}
-
 bool MyAppDelegate::applicationShouldTerminateAfterLastWindowClosed(
-    NS::Application *pSender) {
+    NS::Application *) {
     return true;
 }
 
@@ -287,9 +250,6 @@ void MyMTKViewDelegate::drawInMTKView(MTK::View *pView) {
 #pragma mark - Renderer
 #pragma region Renderer {
 
-// Renderer::Renderer(MTL::Device *pDevice) : _pDevice(pDevice->retain()) {
-//     _pCommandQueue = _pDevice->newCommandQueue();
-// }
 Renderer::Renderer(MTL::Device *pDevice)
     : _pDevice(pDevice ? pDevice->retain() : nullptr), _pCommandQueue(nullptr) {
 
@@ -348,23 +308,5 @@ void Renderer::draw(MTK::View *pView) {
 
     pPool->release();
 }
-
-// Renderer::~Renderer() {
-//     _pCommandQueue->release();
-//     _pDevice->release();
-// }
-
-// void Renderer::draw(MTK::View *pView) {
-//     NS::AutoreleasePool *pPool = NS::AutoreleasePool::alloc()->init();
-
-//     MTL::CommandBuffer *pCmd = _pCommandQueue->commandBuffer();
-//     MTL::RenderPassDescriptor *pRpd = pView->currentRenderPassDescriptor();
-//     MTL::RenderCommandEncoder *pEnc = pCmd->renderCommandEncoder(pRpd);
-//     pEnc->endEncoding();
-//     pCmd->presentDrawable(pView->currentDrawable());
-//     pCmd->commit();
-
-//     pPool->release();
-// }
 
 #pragma endregion Renderer }
