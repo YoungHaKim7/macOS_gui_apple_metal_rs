@@ -1,0 +1,6 @@
+# ninja log v7
+0	74	1795692302388630182	CMakeFiles/a00_window.dir/src/main.cpp.o.ddi	82444d5b1864d3d9
+74	81	1795692302468616959	CMakeFiles/a00_window.dir/CXX.dd	d887f92a0a8e1258
+74	81	1795692302468616959	CMakeFiles/a00_window.dir/CXXModules.json	d887f92a0a8e1258
+74	81	1795692302468616959	CMakeFiles/a00_window.dir/src/main.cpp.o.modmap	d887f92a0a8e1258
+81	339	1795692302469161670	CMakeFiles/a00_window.dir/src/main.cpp.o	8484dda3af025faf
