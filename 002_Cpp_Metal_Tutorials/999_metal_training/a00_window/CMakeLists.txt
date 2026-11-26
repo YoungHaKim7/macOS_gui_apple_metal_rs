@@ -42,8 +42,11 @@ if(APPLE)
     find_library(METAL_FW      Metal      REQUIRED)
     find_library(FOUNDATION_FW Foundation REQUIRED)
     find_library(QUARTZCORE_FW QuartzCore REQUIRED)
+    find_library(APPKIT_FW     AppKit     REQUIRED)
+    find_library(METALKIT_FW   MetalKit   REQUIRED)
     target_link_libraries(${ProjectId} PRIVATE
-        ${METAL_FW} ${FOUNDATION_FW} ${QUARTZCORE_FW}
+        ${METAL_FW} ${FOUNDATION_FW} ${QUARTZCORE_FW} ${APPKIT_FW}
+        ${METALKIT_FW}
     )
 endif()
 

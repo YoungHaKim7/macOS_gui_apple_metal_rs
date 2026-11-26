@@ -162,14 +162,14 @@ NS::Menu *MyAppDelegate::createMenuBar() {
     return pMainMenu->autorelease();
 }
 
-// void MyAppDelegate::applicationWillFinishLaunching(
-//     NS::Notification *pNotification) {
-//     NS::Menu *pMenu = createMenuBar();
-//     NS::Application *pApp =
-//         reinterpret_cast<NS::Application *>(pNotification->object());
-//     pApp->setMainMenu(pMenu);
-//     pApp->setActivationPolicy(NS::ActivationPolicy::ActivationPolicyRegular);
-// }
+void MyAppDelegate::applicationWillFinishLaunching(
+    NS::Notification *pNotification) {
+    NS::Menu *pMenu = createMenuBar();
+    NS::Application *pApp =
+        reinterpret_cast<NS::Application *>(pNotification->object());
+    pApp->setMainMenu(pMenu);
+    pApp->setActivationPolicy(NS::ActivationPolicy::ActivationPolicyRegular);
+}
 
 void MyAppDelegate::applicationDidFinishLaunching(
     NS::Notification *pNotification) {
@@ -252,7 +252,6 @@ void MyMTKViewDelegate::drawInMTKView(MTK::View *pView) {
 
 Renderer::Renderer(MTL::Device *pDevice)
     : _pDevice(pDevice ? pDevice->retain() : nullptr), _pCommandQueue(nullptr) {
-
     if (_pDevice != nullptr) {
         _pCommandQueue = _pDevice->newCommandQueue();
     }
