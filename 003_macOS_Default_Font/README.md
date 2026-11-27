@@ -35,3 +35,53 @@ The default system font on modern macOS is San Francisco (SF Pro for general UI 
 터미널이나 에디터용 SF Mono 또는 Nerd 폰트 설정을 찾고 계시거나, macOS에서 누락되거나 깨진 폰트 표시 문제를 해결하려고 하시나요?
 
 - https://en.wikipedia.org/wiki/Fonts_on_Macintosh
+
+# 내 blog 폰트 바꾸다가 알게 됨.
+- If you mean **built-in CSS/system fonts**, the closest alternatives to Hack Nerd Font are monospace programming fonts.
+
+For your `markdown.css`, I'd recommend this fallback order:
+
+| Font           | Similarity to Hack | Characteristics                       |
+| -------------- | ------------------ | ------------------------------------- |
+| Menlo          | High               | Clean, readable programming font      |
+| Consolas       | High               | Windows programming font              |
+| SFMono-Regular | High               | Apple's monospace font                |
+| ui-monospace   | Depends on OS      | Uses the platform's default monospace |
+| monospace      | Depends on OS      | Generic system fallback               |
+
+## **1. Best choices by operating system**
+
+- **Windows:** Consolas or Cascadia Mono.
+- **macOS:** SF Mono or Menlo.
+- **Linux:** DejaVu Sans Mono.
+
+Cascadia Mono is particularly worth considering on Windows.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub+1
+
+
+
+## **2. Recommended CSS for your blog**
+
+I would use this:
+
+```css
+code {
+    font-family:
+        'Hack Nerd Font',
+        'Cascadia Mono',
+        'Consolas',
+        'SFMono-Regular',
+        'Menlo',
+        'DejaVu Sans Mono',
+        monospace;
+}
+```
+
+- This gives you good cross-platform fallbacks.
+
+- **My recommendation:** If you want something close to Hack without downloading anything, try `Cascadia Mono` on Windows or `SF Mono` on macOS.
+
+- One distinction: these fonts provide programming typography, but they don't include the additional Nerd Font icon glyphs.
